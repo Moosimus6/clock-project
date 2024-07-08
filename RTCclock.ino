@@ -5,16 +5,15 @@
 SevSeg sevseg; 
 RTC_DS1307 rtc;
 
-int mode = 1;
+bool mode = false;
 int time;
-
 int buttonstate = LOW;
 int lastbuttonstate = LOW;
-
+int count = 0;
 
 void setup() {
   // put your setup code here, to run once:
-pinMode(1, INPUT);
+  pinMode(1, OUTPUT);
  byte numDigits = 4;
   byte digitPins[] = {10, 11, 12, 13};
   byte segmentPins[] = {9, 2, 3, 5, 6, 8, 7, 4};
@@ -37,6 +36,9 @@ pinMode(1, INPUT);
   if (!rtc.isrunning()) {
     Serial.println("RTC is NOT running!");
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+
+
+rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 }
 
 
@@ -50,7 +52,7 @@ void loop() {
   sevseg.refreshDisplay(); 
   sevseg.setNumber(time);
 
-if(mode = 1){
+if(mode == true){
   if(now.hour()>12){
   time = ((now.hour()-12)*100)+(now.minute());
   }
@@ -58,17 +60,36 @@ if(mode = 1){
   time = (now.hour()*100)+(now.minute());
   }
   }
-if(mode = -1){
+if(mode == false){
 
     time = ((now.minute())*100)+(now.second());
 
   }
-if (buttonstate == HIGH && lastbuttonstate == LOW) {
-    Serial.println("Button bumped!");
-    mode = mode*-1;
-  }
-lastbuttonstate = buttonstate;
+
+
 delay(5);
+Serial.println(count);
+if(analogRead(A0) == 1023){
+  buttonstate = HIGH;
+}
+else
+{
+  buttonstate=LOW;
+}
+
+
+ if (buttonstate == LOW && lastbuttonstate == HIGH) {
+  if(mode = true){
+    mode = false;
+    
+  }
+  if(mode = false){
+    mode = true;
+    
+  }
+  count++;
+ }
+ lastbuttonstate = buttonstate;
 }
 
 
